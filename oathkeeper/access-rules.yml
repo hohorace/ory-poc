@@ -1,0 +1,31 @@
+-
+  id: "selfservice:anonymous"
+  upstream:
+    preserve_host: true
+    url: "http://selfservice:4455"
+  match:
+    url: "http://127.0.0.1:4455/<**>"
+    methods:
+      - GET
+  authenticators:
+    - handler: anonymous
+  authorizer:
+    handler: allow
+  mutators:
+    - handler: noop
+
+-
+  id: "app:anonymous"
+  upstream:
+    preserve_host: true
+    url: "http://app:5001"
+  match:
+    url: "http://127.0.0.1:5001/<**>"
+    methods:
+      - GET
+  authenticators:
+    - handler: anonymous
+  authorizer:
+    handler: allow
+  mutators:
+    - handler: noop

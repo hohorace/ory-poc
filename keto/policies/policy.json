@@ -1,0 +1,14 @@
+[
+	{
+		"namespace": "app",
+		"object": "/api/data",
+		"relation": "GET",
+		"subject_id": "admin"
+	},
+	{
+		"namespace": "app",
+		"object": "/api/data",
+		"relation": "GET",
+		"subject_id": "dev"
+	}
+]
