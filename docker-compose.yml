@@ -18,7 +18,7 @@ services:
   #   volumes:
   #     - ./oathkeeper:/etc/config/oathkeeper
 
-  web-app:
+  web-app-1:
     build: 
       context: .
       dockerfile: web-app/Dockerfile
@@ -29,6 +29,21 @@ services:
       - KRATOS_EXTERNAL_API_URL=http://kratos:4433
       - KETO_API_READ_URL=http://keto:4466
       - PORT=5001
+    networks:
+      - intranet
+    restart: on-failure
+
+  web-app-2:
+    build: 
+      context: .
+      dockerfile: web-app/Dockerfile
+    image: 'example_web_app'
+    ports:
+      - 5002:5002
+    environment:
+      - KRATOS_EXTERNAL_API_URL=http://kratos:4433
+      - KETO_API_READ_URL=http://keto:4466
+      - PORT=5002
     networks:
       - intranet
     restart: on-failure
