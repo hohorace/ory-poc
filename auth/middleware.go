@@ -129,7 +129,7 @@ func (m *Middleware) formLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 type LoginRequest struct {
-	Username string `json:"username"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
@@ -144,15 +144,17 @@ type SubmitLoginFlowResponse struct {
 }
 
 func (m *Middleware) jsonLogin(w http.ResponseWriter, r *http.Request) {
-	var req LoginRequest
-	err := json.NewDecoder(r.Body).Decode(&req)
+	req := &LoginRequest{}
+	err := json.NewDecoder(r.Body).Decode(req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	if req.Username == "" || req.Password == "" {
-		http.Error(w, "invalid username or password", http.StatusBadRequest)
+	fmt.Fprintf(os.Stderr, fmt.Sprintf("Logging in %s/%s", req.Email, req.Password))
+
+	if req.Email == "" || req.Password == "" {
+		http.Error(w, "invalid email/password", http.StatusBadRequest)
 		return
 	}
 
@@ -167,7 +169,7 @@ func (m *Middleware) jsonLogin(w http.ResponseWriter, r *http.Request) {
 
 	submitLoginBody := kratos.SubmitSelfServiceLoginFlowBody{
 		SubmitSelfServiceLoginFlowWithPasswordMethodBody: &kratos.SubmitSelfServiceLoginFlowWithPasswordMethodBody{
-			Identifier: req.Username,
+			Identifier: req.Email,
 			Method:     "password",
 			Password:   req.Password,
 		},

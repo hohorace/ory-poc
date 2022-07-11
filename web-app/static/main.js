@@ -22,7 +22,7 @@ const setData = (data) => {
 }
 
 const fetchData = async() => {
-    const response = await fetch("/api/data", {
+    const response = await fetch("/api/session", {
         headers: {
         "Content-Type": "application/json",
         },

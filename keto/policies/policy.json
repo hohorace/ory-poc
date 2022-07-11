@@ -1,6 +1,30 @@
 [
 	{
 		"namespace": "app",
+		"object": "/api/session",
+		"relation": "GET",
+		"subject_id": "admin"
+	},
+	{
+		"namespace": "app",
+		"object": "/api/session",
+		"relation": "GET",
+		"subject_id": "dev"
+	},
+	{
+		"namespace": "app",
+		"object": "/api/session",
+		"relation": "GET",
+		"subject_id": "user"
+	},
+	{
+		"namespace": "app",
+		"object": "/api/secret",
+		"relation": "GET",
+		"subject_id": "admin"
+	},
+	{
+		"namespace": "app",
 		"object": "/api/data",
 		"relation": "GET",
 		"subject_id": "admin"

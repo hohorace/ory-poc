@@ -27,12 +27,15 @@ func main() {
 
 	// api level handlers
 	api := secureMux.PathPrefix("/api").Subrouter()
-	api.HandleFunc("/data", protectedData)
+	api.HandleFunc("/session", sessionHandler)
+	api.HandleFunc("/data", dataHandler)
+	api.HandleFunc("/secret", secretHandler)
 
 	// this router will aggregate all subrouters, including secure and public routes
 	r := mux.NewRouter()
 	r.PathPrefix("/api").Handler(secureMux)
 	r.HandleFunc("/login", loginHandler).Methods("POST")
+	r.PathPrefix("/").Handler(nocache(http.FileServer(http.Dir("static/"))))
 
 	// create a server object
 	s := &http.Server{
@@ -45,11 +48,10 @@ func main() {
 }
 
 type ProtectedData struct {
-	Username string   `json:"username"`
-	Roles    []string `json:"roles"`
+	Foo string `json:"foo"`
 }
 
-func protectedData(w http.ResponseWriter, r *http.Request) {
+func sessionHandler(w http.ResponseWriter, r *http.Request) {
 	session := r.Context().Value("session").(*kratos.Session)
 
 	data, err := json.Marshal(session)
@@ -61,4 +63,25 @@ func protectedData(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(data)
+}
+
+func dataHandler(w http.ResponseWriter, r *http.Request) {
+	data := `{"foo": "bar"}`
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(data))
+}
+
+func secretHandler(w http.ResponseWriter, r *http.Request) {
+	data := `{"secret": "secret"}`
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(data))
+}
+
+func nocache(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "no-cache")
+		h.ServeHTTP(w, r)
+	})
 }
