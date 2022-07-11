@@ -1,11 +1,5 @@
 version: '3.7'
 
-x-default-volumes: &default_volumes
-  volumes:
-    - ./:/app
-    - node-modules:/app/node_modules
-    - ./dev.db:/tmp/dev.db
-
 services:
   # oathkeeper:
   #   image: oryd/oathkeeper:v0.38
@@ -24,24 +18,35 @@ services:
   #   volumes:
   #     - ./oathkeeper:/etc/config/oathkeeper
 
-  app:
-    build:
+  web-app:
+    build: 
       context: .
-    image: 'example_app'
+      dockerfile: web-app/Dockerfile
+    image: 'example_web_app'
     ports:
       - 5001:5001
     environment:
       - KRATOS_EXTERNAL_API_URL=http://kratos:4433
-      - KRATOS_UI_URL=http://127.0.0.1:4455
       - KETO_API_READ_URL=http://keto:4466
       - PORT=5001
     networks:
       - intranet
     restart: on-failure
-    volumes:
-      - type: bind
-        source: ./
-        target: /app
+
+  api-app:
+    build: 
+      context: .
+      dockerfile: api-app/Dockerfile
+    image: 'example_api_app'
+    ports:
+      - 5009:5009
+    environment:
+      - KRATOS_EXTERNAL_API_URL=http://kratos:4433
+      - KETO_API_READ_URL=http://keto:4466
+      - PORT=5009
+    networks:
+      - intranet
+    restart: on-failure
 
   postgres-kratos:
     image: postgres:9.6
@@ -85,18 +90,32 @@ services:
       - intranet
     command: serve -c /etc/config/kratos/kratos.yml --dev --watch-courier
 
-  selfservice:
-    image: oryd/kratos-selfservice-ui-node:v0.10.1
+  kratos-setup:
+    depends_on: 
+      - kratos
+    image: oryd/kratos:v0.10.1
     environment:
-      - KRATOS_PUBLIC_URL=http://kratos:4433/
-      - KRATOS_BROWSER_URL=http://127.0.0.1:4433/
-      # - PORT=4455
-      - SECURITY_MODE=
+      - KRATOS_ADMIN_URL=http://kratos:4434
+    volumes: 
+      - type: bind
+        source: ./kratos/identities
+        target: /home/ory
     networks:
       - intranet
-    ports:
-      - 4455:3000
-    restart: on-failure
+    command: import identities /home/ory/gary.json /home/ory/jimmy.json /home/ory/ric.json --format=json-pretty
+
+  # selfservice:
+  #   image: oryd/kratos-selfservice-ui-node:v0.10.1
+  #   environment:
+  #     - KRATOS_PUBLIC_URL=http://kratos:4433/
+  #     - KRATOS_BROWSER_URL=http://127.0.0.1:4433/
+  #     # - PORT=4455
+  #     - SECURITY_MODE=
+  #   networks:
+  #     - intranet
+  #   ports:
+  #     - 4455:3000
+  #   restart: on-failure
 
   mailslurper:
     image: oryd/mailslurper:latest-smtps
@@ -133,7 +152,7 @@ services:
     networks:
       - intranet
 
-  keto-perms:
+  keto-setup:
     image: oryd/keto:v0.8.0-alpha.2
     volumes:
       - type: bind
@@ -149,19 +168,6 @@ services:
     networks:
       - intranet
     restart: on-failure
-
-  keto-check:
-    image: oryd/keto:v0.8.0-alpha.2
-    environment:
-      - KETO_WRITE_REMOTE=keto:4467
-      - KETO_READ_REMOTE=keto:4466
-      - LOG_LEVEL=debug
-      - DSN=postgres://keto:secret@postgres-keto:5432/keto?sslmode=disable&max_conns=20&max_idle_conns=4
-    command: check horacelongshotsystems.co.uk GET app /api/data
-    depends_on:
-      - keto-perms
-    networks:
-      - intranet
 
   keto:
     image: oryd/keto:v0.8.0-alpha.2

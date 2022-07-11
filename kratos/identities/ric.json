@@ -1,0 +1,18 @@
+{
+    "credentials": {
+      "password": {
+        "config": {
+          "password": "ric@longshotsystems.co.uk"
+        }
+      }
+    },
+    "schema_id": "default",
+    "state": "active",
+    "traits": {
+        "email": "ric@longshotsystems.co.uk",
+        "name": {
+            "first": "ric"
+        },
+        "role": "admin"
+    }
+}

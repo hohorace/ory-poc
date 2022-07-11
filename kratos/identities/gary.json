@@ -1,0 +1,18 @@
+{
+    "credentials": {
+      "password": {
+        "config": {
+          "password": "gary@longshotsystems.co.uk"
+        }
+      }
+    },
+    "schema_id": "default",
+    "state": "active",
+    "traits": {
+        "email": "gary@longshotsystems.co.uk",
+        "name": {
+            "first": "gary"
+        },
+        "role": "dev"
+    }
+}
