@@ -232,17 +232,28 @@ func (m *Middleware) activeAuthingHandler(h http.Handler) http.Handler {
 		namespace := "app"
 		object := r.URL.Path
 		relation := r.Method
-		subjectId := traits["role"].(string)
 
+		roles := traits["roles"].([]interface{})
+		
 		fmt.Printf("path: %s\n", object)
+		
+		allowed := false
+		for _, role := range roles {
+			subjectId := role.(string)
 
-		check, resp, err := m.keto.ReadApi.GetCheck(ctx).Namespace(namespace).Object(object).Relation(relation).SubjectId(subjectId).Execute()
-		if err != nil {
-			http.Error(w, fmt.Sprintf("Error when calling `ReadApi.GetCheck``: %v\nFull HTTP response: %v\n", err, resp), http.StatusBadGateway)
-			return
+			check, resp, err := m.keto.ReadApi.GetCheck(ctx).Namespace(namespace).Object(object).Relation(relation).SubjectId(subjectId).Execute()
+			if err != nil {
+				http.Error(w, fmt.Sprintf("Error when calling `ReadApi.GetCheck``: %v\nFull HTTP response: %v\n", err, resp), http.StatusBadGateway)
+				return
+			}
+
+			if check.GetAllowed() {
+				allowed = true
+				break
+			}
 		}
-
-		if !check.GetAllowed() {
+		
+		if !allowed {
 			http.Error(w, "Access denied", http.StatusUnauthorized)
 			return
 		}

@@ -13,6 +13,6 @@
         "name": {
             "first": "jimmy"
         },
-        "role": "user"
+        "roles": ["user"]
     }
 }

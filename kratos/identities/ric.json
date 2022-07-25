@@ -13,6 +13,6 @@
         "name": {
             "first": "ric"
         },
-        "role": "admin"
+        "roles": ["user", "dev", "admin"]
     }
 }

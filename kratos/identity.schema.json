@@ -35,11 +35,14 @@
             }
           }
         },
-        "role": {
-          "title": "Role",
-          "type": "string",
-          "default": "user",
-          "enum": ["user", "dev", "admin"]
+        "roles": {
+          "title": "Roles",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["user", "dev", "admin"]
+          },
+          "default": ["user"]
         }
       },
       "required": [

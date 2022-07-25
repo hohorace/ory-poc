@@ -17,8 +17,8 @@ const setForm = (visible) => {
 
 const setData = (data) => {
     const placeholder = document.getElementById("data-placeholder")
-    const { role, name } = data.identity.traits
-    placeholder.innerHTML = `<div><h4>${name.first.toUpperCase()}, you have the following role</h4><span>${role}</span></div>`
+    const { roles, name } = data.identity.traits
+    placeholder.innerHTML = `<div><h4>${name.first.toUpperCase()}, you have the following roles</h4><span>${roles.join(" ")}</span></div>`
 }
 
 const fetchData = async() => {
